@@ -70,7 +70,7 @@ public class ScbmigrationApplication {
 		String bucketTo = null;
 		
 		if(args.length<4) {
-			System.out.println( "java -jar SCBMigrationUtil-jar-with-dependencies.jar <CouchBase URL> <bucketName-From> <bucketName-To> <ActionType> <EventTemplateDataFile>" );
+			System.out.println( "Check the command => java -jar SCBMigrationUtil-jar-with-dependencies.jar <CouchBase URL> <bucketName-From> <bucketName-To> <ActionType> <EventTemplateDataFile>" );
 			System.exit( 0 );
 		}
 		
@@ -323,16 +323,16 @@ public class ScbmigrationApplication {
 			eventObject.addProperty("id", event_id);
 			eventObject.addProperty("docType", "EventDefinition");
 			eventObject.addProperty("name", event_name);
-			eventObject.add("category", emptyArray);
+			eventObject.addProperty("category", "");
 			eventObject.addProperty("status", status);
 			eventObject.addProperty("description", description);
-			eventObject.addProperty("asEventTemplate", "true");
+			eventObject.addProperty("asEventTemplate", true);
 			eventObject.addProperty("eventEndTime", "");
 			eventObject.addProperty("eventStartTime", "");
-			eventObject.addProperty("recurringCount", "0");
+			eventObject.addProperty("recurringCount", 0);
 			eventObject.addProperty("enableRecuringEvent", "false");
 			eventObject.addProperty("taggedForAll", "true");
-			eventObject.addProperty("enableIntermediateEvent", "false");
+			eventObject.addProperty("enableIntermediateEvent", false);
 
 			JsonObject eventSiftExpression = new JsonObject();
 
@@ -351,7 +351,7 @@ public class ScbmigrationApplication {
 			eventSiftExpression.add("data", data);
 
 			eventObject.add("eventSiftExpression", eventSiftExpression);
-			eventObject.add("eventLocations", emptyArray);
+			eventObject.add("eventLocations", null);
 			eventObject.addProperty("targetSystemID", "");
 			eventObject.add("eventpayloadsummary", emptyArray);
 			eventObject.addProperty("campaigns", "");
@@ -362,7 +362,7 @@ public class ScbmigrationApplication {
 			eventObject.add("eventPayloadExpressions", emptyArray);
 			eventObject.addProperty("enableWhitelist", "NO_WHITELIST");
 			eventObject.addProperty("uploadedWhitelistId", "");
-			eventObject.add("eventWhitelistExpression", emptyObject);
+			eventObject.add("eventWhitelistExpression", null);
 			eventObject.add("eventExtentedAtrributes", emptyArray);
 			eventObject.addProperty("businessUnit", "");
 			eventObject.add("updateHistory", emptyArray);

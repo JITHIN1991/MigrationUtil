@@ -1,0 +1,10 @@
+Mar 22, 2022 3:34:05 PM com.knowesis.SCBMigrationUtility.ScbmigrationApplication main
+INFO: Started from main
+Mar 22, 2022 3:34:05 PM com.knowesis.SCBMigrationUtility.ScbmigrationApplication updateUtility
+INFO: Entered - updateUtility
+Mar 22, 2022 3:34:10 PM com.knowesis.SCBMigrationUtility.ScbmigrationApplication updateEvent
+INFO: Entered - updateEvent
+Mar 22, 2022 3:34:10 PM com.knowesis.SCBMigrationUtility.ScbmigrationApplication initialize
+INFO: Error from initialize : /home/jithin/SCBMigrationUtil/JavaUtil/SCBMigrationUtility/target/EventTemplateRecord-1.txt (No such file or directory)
+Mar 22, 2022 3:34:10 PM com.knowesis.SCBMigrationUtility.ScbmigrationApplication main
+INFO: Error from main : /home/jithin/SCBMigrationUtil/JavaUtil/SCBMigrationUtility/target/EventTemplateRecord-1.txt (No such file or directory)
