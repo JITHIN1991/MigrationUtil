@@ -333,6 +333,7 @@ public class ScbmigrationApplication {
 			eventObject.addProperty("enableRecuringEvent", "false");
 			eventObject.addProperty("taggedForAll", "true");
 			eventObject.addProperty("enableIntermediateEvent", false);
+			eventObject.addProperty("type", "Behavioural");
 
 			JsonObject eventSiftExpression = new JsonObject();
 
