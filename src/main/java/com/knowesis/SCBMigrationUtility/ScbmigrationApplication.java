@@ -340,16 +340,23 @@ public class ScbmigrationApplication {
 			JsonObject fromFile = new JsonObject();
 			fromFile = new Gson().fromJson(bricks_logic, JsonObject.class);
 
-			JsonObject data = new JsonObject();
-			data.add("bricksExpression", fromFile.get("expressionString"));
-			data.add("expressionType", fromFile.get("expressionType"));
-			data.add("bricksUsedInExpression", fromFile.getAsJsonArray("bricksUsed"));
-			data.add("expressionReturnType", fromFile.get("returnType"));
-			data.add("bricksLogic", fromFile.getAsJsonObject("bricksLogic"));
-			data.addProperty("bricksJavaExpression", "");
+//			JsonObject data = new JsonObject();
+//			data.add("bricksExpression", fromFile.get("expressionString"));
+//			data.add("expressionType", fromFile.get("expressionType"));
+//			data.add("bricksUsedInExpression", fromFile.getAsJsonArray("bricksUsed"));
+//			data.add("expressionReturnType", fromFile.get("returnType"));
+//			data.add("bricksLogic", fromFile.getAsJsonObject("bricksLogic"));
+//			data.addProperty("bricksJavaExpression", "");
 
 			eventSiftExpression.addProperty("type", "Bricks Editor");
-			eventSiftExpression.add("data", data);
+
+			eventSiftExpression.add("bricksExpression", fromFile.get("expressionString"));
+			eventSiftExpression.add("expressionType", fromFile.get("expressionType"));
+			eventSiftExpression.add("bricksUsedInExpression", fromFile.getAsJsonArray("bricksUsed"));
+			eventSiftExpression.add("expressionReturnType", fromFile.get("returnType"));
+			eventSiftExpression.add("bricksLogic", fromFile.getAsJsonObject("bricksLogic"));
+			eventSiftExpression.addProperty("bricksJavaExpression", "");
+
 
 			eventObject.add("eventSiftExpression", eventSiftExpression);
 			eventObject.add("eventLocations", null);
@@ -376,7 +383,8 @@ public class ScbmigrationApplication {
 			eventObject.addProperty("approvalWorkflowEnabled", "false");
 			eventObject.addProperty("approverGroups", "");
 			eventObject.addProperty("approvalRemarks", "");
-
+			eventObject.addProperty("businessUnit", "SCB");
+			
 			String json = null;
 			json = new Gson().toJson(eventObject);
 
