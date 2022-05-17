@@ -97,11 +97,11 @@ public class ScbmigrationApplication {
 			System.exit(0);			
 		}
 		if(actionType==null || actionType.equals("")) {
-			System.out.println("BucketTo is empty...!");
+			System.out.println("actionType is empty...!");
 			System.exit(0);			
 		}
 		
-		if (actionType.equals("EVENT")||actionType.equals("ALL")) {		
+		if (actionType.equals("EVENT")||actionType.equals("BU")||actionType.equals("ALL")) {		
 			if(args.length < 5) {
 				System.out.println("EVENT TEMPLATE - FILE MISSING...!");
 				System.exit(0);
@@ -157,12 +157,12 @@ public class ScbmigrationApplication {
 			updateEvent(filePath);
 			break;
 		case "BU":
-			updateBusinessUnit(url);
+			updateBusinessUnit(filePath);
 			break;
 		case "ALL":
 			updateOffer();
 			updateEvent(filePath);
-			updateBusinessUnit(url);
+			updateBusinessUnit(filePath);
 			break;
 		default:
 			System.out.println("Invalid action type !");
@@ -396,7 +396,7 @@ public class ScbmigrationApplication {
 		read.close();
 	}
 
-	private static void updateBusinessUnit(String url) throws InterruptedException, FileNotFoundException {
+	private static void updateBusinessUnit(String filePath) throws InterruptedException, FileNotFoundException {
 //		logger.info("Entered - updateBU");
 		System.out.println("Entered - updateBU");
 		// GET all documents from couch
@@ -405,7 +405,8 @@ public class ScbmigrationApplication {
 		CouchbaseClient toClient = (CouchbaseClient) toCache.getClient();
 
 		
-		Iterator<String> views = getAllViews(url);
+//		Iterator<String> views = getAllViews(url);
+		Iterator<String> views = readAllViewsFromFile(filePath);
 		Map<String, List<String>> issuesReported = new HashMap<>();
 		while (views.hasNext()) {
 			String view = views.next();
@@ -452,10 +453,16 @@ public class ScbmigrationApplication {
 //			logger.info("<<<<<UNDER " + viewWithIssueDocs + " VIEW>>>>>>");
 			System.out.println("<<<<<UNDER " + viewWithIssueDocs + " VIEW>>>>>>");
 			List<String> docs = issuesReported.get(viewWithIssueDocs);
+			if(docs.isEmpty()) {
+				System.out.println("No Issues Reported under this view");
+				System.out.println("-------------------------------------------------------------------------------------------------------------------------------------------------");
+				continue;
+			}
 			for (String doc : docs) {
 //				logger.info(doc);
 				System.out.println(doc);
 			}
+			System.out.println("-------------------------------------------------------------------------------------------------------------------------------------------------");
 		}
 		
 //		logger.info("Completed BU update");
@@ -464,7 +471,9 @@ public class ScbmigrationApplication {
 
 	public static Iterator<String> getAllViews(String url) {
 		RestTemplate template = new RestTemplate();
-		ResponseEntity<String> res = template.getForEntity(url + "/config/ddocs", String.class);
+		String newUrl = url+"/config/ddocs";
+		System.out.println("NEW URL: "+newUrl);
+		ResponseEntity<String> res = template.getForEntity(newUrl, String.class);
 		System.out.println(res.getBody());
 		ObjectMapper mapper = new ObjectMapper();
 
@@ -500,6 +509,22 @@ public class ScbmigrationApplication {
 		return null;
 	}
 
+
+
+
+	public static Iterator<String> readAllViewsFromFile(String filePath) throws FileNotFoundException {
+
+		System.out.println("FILEPATH >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>:"+filePath);
+		Scanner read = new Scanner(new File(filePath));
+		read.useDelimiter("\\n");
+		List<String> viewsList = new ArrayList<String>();
+		while (read.hasNext()) {
+			viewsList.add(read.next());
+		}
+		return viewsList.iterator();
+	}
+
+	
 //	public static CouchbaseClient couchbaseClient(List<URI> uris) {
 //		try {
 //			CouchbaseClient cl = new CouchbaseClient(uris, "config", "");
