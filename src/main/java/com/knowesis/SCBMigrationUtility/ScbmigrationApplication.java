@@ -6,11 +6,13 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.Set;
 import java.util.logging.FileHandler;
 import java.util.logging.SimpleFormatter;
 
@@ -70,7 +72,7 @@ public class ScbmigrationApplication {
 		String bucketTo = null;
 		
 		if(args.length<4) {
-			System.out.println( "Check the command => java -jar SCBMigrationUtil-jar-with-dependencies.jar <CouchBase URL> <bucketName-From> <bucketName-To> <ActionType> <EventTemplateDataFile>" );
+			System.out.println( "Check the command => java -jar SCBMigrationUtil-jar-with-dependencies.jar <CouchBase URL> <bucketName-From> <bucketName-To> <ActionType> <DataFile>" );
 			System.exit( 0 );
 		}
 		
@@ -101,7 +103,7 @@ public class ScbmigrationApplication {
 			System.exit(0);			
 		}
 		
-		if (actionType.equals("EVENT")||actionType.equals("BU")||actionType.equals("ALL")) {		
+		if (actionType.equals("EVENT")||actionType.equals("BU")||actionType.equals("DELETE")||actionType.equals("ALL")) {
 			if(args.length < 5) {
 				System.out.println("EVENT TEMPLATE - FILE MISSING...!");
 				System.exit(0);
@@ -159,6 +161,9 @@ public class ScbmigrationApplication {
 		case "BU":
 			updateBusinessUnit(filePath);
 			break;
+		case "DELETE":
+			deleteDocuments(filePath);
+			break;
 		case "ALL":
 			updateOffer();
 			updateEvent(filePath);
@@ -170,6 +175,74 @@ public class ScbmigrationApplication {
 		}
 //		logger.info("-----------------Completed-------------------");
 		System.out.println("-----------------Completed-------------------");
+	}
+
+	private static void deleteDocuments(String filePath) throws FileNotFoundException {
+		System.out.println("Entered - deleting Bulk Documents");
+		// GET all documents from couch
+		CouchbaseClient fromClient = (CouchbaseClient) fromCache.getClient();
+		CouchbaseClient toClient = (CouchbaseClient) toCache.getClient();
+		Iterator<String> docIdsToBeDeleted = readAllDocIdsFromFile(filePath);
+		Set<String> issuesReported = new HashSet<>();
+
+		long totalDocCount=0;
+		long deleteDocCount=0;
+		long notFoundCount=0;
+		System.out.println();
+		System.out.println();
+		System.out.println();
+		while (docIdsToBeDeleted.hasNext()) {
+			totalDocCount++;
+			String docIdToBeDeleted = docIdsToBeDeleted.next();
+			List<String> docsWithIssues = new ArrayList<>();
+			try {
+				Object obj = toClient.get(docIdToBeDeleted);
+				if (obj == null) {
+					notFoundCount++;
+					System.out.println("Not Found the Document with id : " + docIdToBeDeleted);
+				} else {
+					toClient.delete(docIdToBeDeleted);
+					deleteDocCount++;
+					System.out.println("Deleted Document with id : " + docIdToBeDeleted);
+				}
+			} catch (Throwable e) {
+				issuesReported.add(docIdToBeDeleted);
+				System.out.println("Error occurred while deleting the document with id : " + docIdToBeDeleted);
+			}
+		}
+		System.out.println();
+		System.out.println();
+		System.out.println();
+		System.out.println("--------------------------------------DELETION COMPLETED--------------------------------------");
+		System.out.println();
+		System.out.println();
+		System.out.println();
+		if(!issuesReported.isEmpty()) {
+			System.out.println();
+			System.out.println();
+			System.out.println();
+			System.out.println(
+					"##################################################ISSUES REPORTED FOR THESE ITEMS####################################################");
+			for (String docIdwithIssue : issuesReported) {
+				System.out.println(
+						"-------------------------------------------------------------------------------------------------------");
+				System.out.println(docIdwithIssue);
+			}
+			System.out.println(
+					"-------------------------------------------------------------------------------------------------------");
+			System.out.println();
+			System.out.println();
+			System.out.println();
+
+		}		
+		System.out.println("Completed BULK Delete");
+		System.out.println("Total documents to be deleted    : "+totalDocCount);
+		System.out.println("Successfully deleted             : "+deleteDocCount);
+		System.out.println("Failed to delete                 : "+issuesReported.size());
+		System.out.println("Not found in CB                  : "+notFoundCount);
+		System.out.println();
+		System.out.println();
+		System.out.println();
 	}
 
 	private static Iterator<ViewRow> fetchData(String viewName) throws InterruptedException {
@@ -524,6 +597,19 @@ public class ScbmigrationApplication {
 		return viewsList.iterator();
 	}
 
+	public static Iterator<String> readAllDocIdsFromFile(String filePath) throws FileNotFoundException {
+
+		System.out.println("FILEPATH >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>:"+filePath);
+		Scanner read = new Scanner(new File(filePath));
+		read.useDelimiter("\\n");
+		List<String> docIdList = new ArrayList<String>();
+		while (read.hasNext()) {
+			docIdList.add(read.next());
+		}
+		return docIdList.iterator();
+	}
+
+	
 	
 //	public static CouchbaseClient couchbaseClient(List<URI> uris) {
 //		try {
